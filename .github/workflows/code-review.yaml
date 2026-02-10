@@ -39,3 +39,4 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_MODEL: gemini-2.0-flash
           EXCLUDE: "*.md,*.txt,package-lock.json,*.yml,*.yaml"
+          MAX_CONCURRENT_FILES: 1
