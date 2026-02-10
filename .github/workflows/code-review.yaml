@@ -4,10 +4,7 @@ on:
   issue_comment:
     types: [created]
 
-permissions:
-  contents: read
-  pull-requests: write
-  issues: write
+permissions: write-all
 
 jobs:
   gemini-code-review:
@@ -16,73 +13,29 @@ jobs:
       github.event.issue.pull_request &&
       contains(github.event.comment.body, '/gemini-review')
     steps:
+      - name: PR Info
+        run: |
+          echo "Comment: ${{ github.event.comment.body }}"
+          echo "Issue Number: ${{ github.event.issue.number }}"
+          echo "Repository: ${{ github.repository }}"
+
       - name: Checkout Repo
         uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          fetch-depth: 0
 
-      - name: Install Google Gen AI SDK
-        run: pip install google-generativeai
-
-      - name: Run Gemini Code Review
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          PR_NUMBER: ${{ github.event.issue.number }}
-          REPO: ${{ github.repository }}
+      - name: Get PR Details
+        id: pr
         run: |
-          python -c "
-          import os
-          import subprocess
-          import google.generativeai as genai
+          PR_JSON=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.issue.number }})
+          echo "head_sha=$(echo $PR_JSON | jq -r .head.sha)" >> $GITHUB_OUTPUT
+          echo "base_sha=$(echo $PR_JSON | jq -r .base.sha)" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-          # 1. Setup Gemini
-          genai.configure(api_key=os.environ['GEMINI_API_KEY'])
-          model = genai.GenerativeModel('gemini-1.5-flash')
-
-          # 2. Get the PR Diff using GitHub CLI
-          pr_num = os.environ['PR_NUMBER']
-          repo = os.environ['REPO']
-          print(f'Fetching diff for PR #{pr_num} in {repo}...')
-          
-          # Get the diff text
-          diff_cmd = ['gh', 'pr', 'diff', pr_num, '--repo', repo]
-          process = subprocess.run(diff_cmd, capture_output=True, text=True)
-          diff_text = process.stdout
-
-          if not diff_text:
-              print('No diff found or error fetching diff.')
-              exit(1)
-
-          # Limit diff size to prevent token overflow (simple truncation)
-          if len(diff_text) > 30000:
-              diff_text = diff_text[:30000] + '\n...(truncated)...'
-
-          # 3. Ask Gemini to review
-          prompt = f'''
-          You are an expert Senior Software Engineer. Review the following code diff.
-          Focus on:
-          1. Security vulnerabilities.
-          2. Potential bugs.
-          3. Performance improvements.
-          4. Code cleanliness/Best practices.
-          
-          Be concise and constructive.
-
-          Code Diff:
-          {diff_text}
-          '''
-          
-          print('Sending to Gemini...')
-          response = model.generate_content(prompt)
-          review_text = response.text
-
-          # 4. Post the review as a comment
-          print('Posting comment...')
-          comment_cmd = ['gh', 'pr', 'comment', pr_num, '--repo', repo, '--body', review_text]
-          subprocess.run(comment_cmd, check=True)
-          print('Review posted!')
-          "
+      - uses: truongnh1992/gemini-ai-code-reviewer@main
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: gemini-2.0-flash
+          EXCLUDE: "*.md,*.txt,package-lock.json,*.yml,*.yaml"
