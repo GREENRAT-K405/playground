@@ -45,4 +45,47 @@ jobs:
           EXCLUDE: "*.md,*.txt,package-lock.json"
         #   MAX_CONCURRENT_FILES: 1
 
-        
+          PROMPT: |
+                You are reviewing a pull request for the ControlCore (concore) project.
+
+                Project context:
+                - concore is a closed loop control/simulation orchestration framework
+                - It heavily relies on GraphML parsing, CLI tools, ZeroMQ-based IPC, Docker/POSIX/Windows compatibility
+                - Backward compatibility and deterministic behavior are critical
+
+                Your tasks:
+
+                1. Pull Request Summary
+                Provide a concise 2–4 sentence summary:
+                - What problem the PR solves
+                - What key changes were introduced
+                - Which components are affected
+                - Mention tests, security implications, or compatibility impact if relevant
+
+                2. Code Review Feedback
+                Provide actionable feedback as bullet points.
+                For each:
+                - Reference the relevant file/function
+                - Explain why it matters
+                - Prefer suggestions over commands
+
+                Focus on:
+                - Backward compatibility
+                - Cross-platform behavior
+                - Robustness of parsing and Inter-Process-Communication logic
+                - Error handling and logging
+                - Test coverage and edge cases
+
+                3. Scope Discipline
+                - Do not expand scope
+                - Avoid unnecessary refactors
+                - Avoid stylistic nitpicks
+
+                4. Final Assessment
+                End with:
+                - Overall status
+                - Strengths
+                - Blocking issues (if any)
+
+                Use a professional, constructive, maintainer-friendly tone.
+            
