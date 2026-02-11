@@ -13,25 +13,25 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-      - uses: actions/first-interaction@v3
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+    - uses: actions/first-interaction@v3
+      with:
+        # NOTICE: In v3, these must use underscores (_), not dashes (-)
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        
+        issue_message: |
+          👋 Welcome to the Control-core Project, @${{ github.actor }}! Thank you for opening your first issue in concore-editor.
+          We appreciate your contribution to the organization and will review it as soon as possible.
           
-          # Message for first-time issues
-          issue-message: |
-            👋 Welcome to the Control-core Project, @${{ github.actor }}! Thank you for opening your first issue in concore-editor.
-            We appreciate your contribution to the organization and will review it as soon as possible.
-            
-            Before we get started, please check out these resources:
-            - 📘 [Contribution Guidelines](https://github.com/ControlCore-Project/concore/blob/main/CONTRIBUTING.md)
-            - 📚 [Project Documentation](https://control-core.readthedocs.io/)
+          Before we get started, please check out these resources:
+          - 📘 [Contribution Guidelines](https://github.com/ControlCore-Project/concore/blob/main/CONTRIBUTING.md)
+          - 📚 [Project Documentation](https://control-core.readthedocs.io/)
           
-          # Message for first-time pull requests
-          pr-message: |
-            🎉 Welcome aboard, @${{ github.actor }}! Thank you for your first pull request in concore-editor.
-            
-            Please ensure that you are contributing to the **dev** branch.
-            Your contribution means a lot to us. We'll review it shortly.
-            Please ensure you have reviewed our [Contribution Guidelines](https://github.com/ControlCore-Project/concore/blob/main/CONTRIBUTING.md).
-            Type "/gemini-review" to get your changes verified by gemini bot
-            If you have any questions, feel free to ask. Happy coding!
+        pr_message: |
+          🎉 Welcome aboard, @${{ github.actor }}! Thank you for your first pull request in concore-editor.
+          
+          Please ensure that you are contributing to the **dev** branch.
+          Your contribution means a lot to us. We'll review it shortly.
+          
+          Please ensure you have reviewed our [Contribution Guidelines](https://github.com/ControlCore-Project/concore/blob/main/CONTRIBUTING.md).
+          
+          If you have any questions, feel free to ask. Happy coding!
