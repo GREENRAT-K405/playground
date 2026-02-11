@@ -1,0 +1,25 @@
+name: Greetings
+
+# Trigger the workflow on new pull requests and issues
+on: [pull_request_target, issues]
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+    - uses: actions/first-interaction@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        # Message for first-time issues
+        issue-message: |
+          👋 Welcome to the project! Thank you for opening your first issue.
+          We appreciate your contribution and will review it as soon as possible.
+          
+        # Message for first-time pull requests
+        pr-message: |
+          🎉 Welcome aboard! Thank you for your first pull request.
+          Your contribution means a lot to us. We'll review it shortly.
+          If you have any questions, feel free to ask. Happy coding!
